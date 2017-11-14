@@ -45,14 +45,12 @@ end
 ```
 
 ## TODO
-- add support for streaming and chunked requests
-- add support for multipart form requests
+- add support for streaming and chunked requests to hackney adapter?
+- add explicit support for multipart form requests (currently possible, just not explicit)
 - move integration tests to local api server, rather than httpbin
 
 
 ## Installation
-
->(Still a WIP. Not yet available on hex)
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `http_builder` to your list of dependencies in `mix.exs`:
