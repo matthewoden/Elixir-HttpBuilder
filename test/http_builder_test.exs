@@ -9,12 +9,22 @@ defmodule HttpBuilderTest do
   doctest HttpBuilder
 
   
-  test "new adds a host and adapter to a request" do
-    request = new("google.com", Adapters.HTTPosion)
-    assert request.host  == "google.com"
-    assert request.adapter == Adapters.HTTPosion
+  test "new creates a new HttpRequest" do
+    assert new() == %HttpRequest{}
   end
 
+  test "cast merges a map of options into an HttpRequest" do
+      request = cast(%{host: "google.com", adapter: Adapters.HTTPosion })
+      
+      assert request.host  == "google.com"
+      assert request.adapter == Adapters.HTTPosion
+  end
+
+  test "with adapter sets an adapter for the request" do
+    request = new |> with_adapter(Adapters.HTTPosion)
+    
+    assert request.adapter == Adapters.HTTPosion
+end
 
   @methods [:get, :put, :post, :patch, :delete, :options, :connect]
   

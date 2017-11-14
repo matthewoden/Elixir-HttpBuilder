@@ -4,6 +4,11 @@ defmodule HttpBuilder.Mixfile do
   def project do
     [
       app: :http_builder,
+      name: "HttpBuilder",
+      source_url: "https://github.com/matthewoden/Elixir-HttpBuilder"
+      docs: docs(),
+      package: package(),
+      description: description(),
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
@@ -11,19 +16,35 @@ defmodule HttpBuilder.Mixfile do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
+    []
+  end
+
+  defp package do
     [
-      extra_applications: [:logger]
+      name: "HttpBuilder",
+      licenses: ["MIT"],
+      maintainers: ["Matthew Potter"]
+      links: %{"GitHub" => "https://github.com/matthewoden/Elixir-HttpBuilder"}
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
+  def description do
+    "A simple DSL for composing HTTP requests. Based off the lovely Elm-Http-Builder."
+  end
+
+  defp docs do
+    [
+      main: "HttpBuilder", 
+      extras: ["README.md"]
+    ]
+  end
+
   defp deps do
     [
       {:httpoison, "~> 0.13.0", optional: true},
-      {:poison, "~> 3.0", optional: true}
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:poison, "~> 3.0", optional: true},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false}
     ]
   end
 end

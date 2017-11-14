@@ -15,7 +15,7 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
     test "can make a GET request" do
         
         {:ok, response} = 
-            new("https://httpbin.org", Adapters.HTTPosion)
+            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> get("/get")
             |> send()
 
@@ -26,7 +26,7 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
     test "can make a DELETE request" do
         
         {:ok, response} = 
-            new("https://httpbin.org", Adapters.HTTPosion)
+            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> delete("/delete") 
             |> send()
 
@@ -36,7 +36,7 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
     test "can make a POST request with a standard body" do
         
         {:ok, response } = 
-            new("https://httpbin.org", Adapters.HTTPosion)
+            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> post("/post") 
             |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
             |> send()
@@ -54,7 +54,7 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
         }
 
         {:ok, response } = 
-            new("https://httpbin.org", Adapters.HTTPosion)
+            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> post("/post") 
             |> with_form_encoded_body(body)
             |> send()
@@ -79,9 +79,9 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
     # end
 
     test "returns an error on a bad request" do
-
+        params = %{ host: "http://localhost:12345", adapter: Adapters.HTTPosion }
         response = 
-            new("http://localhost:12345", Adapters.HTTPosion)
+            cast(params)
             |> post("/posts") 
             |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
             |> with_headers(%{"Content-type" => "application/json; charset=UTF-8"})

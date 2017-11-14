@@ -20,14 +20,32 @@ defmodule HttpBuilder do
     Takes in a host, providing the base path for http requests, and an adapter
     module to eventually run the request.
     """
-    @spec new(host, adapter) :: request
-    def new(host, adapter) when is_binary(host) and is_atom(adapter) do
-        %HttpRequest{ host: host, adapter: adapter }
-    end
+    @spec new() :: request
+    def new(), do: %HttpRequest{}
 
-    def new(_, _) do
-      raise ArgumentError, message: "HttpBuilder.New requires a host (string), and an adapter (atom)."
-    end
+    @doc """
+    Casts a map of predefined options to a `HttpBuilder.Request` struct.
+    """
+    def cast(map) when is_map(map), do: Map.merge(%HttpRequest{}, map)
+
+    @doc """
+    Sets the host for the request. 
+    
+    Can be used for host/path composition to create a client library for 
+    an API.
+    """
+    def with_host(request, host) when is_binary(host), 
+        do: %{ request | host: host }
+
+    @doc """
+    Sets the adapter for the request.
+
+    Takes an atom, representing a module that conforms to the 
+    `HttpBuilder.Adapter` behaviour.
+    """
+    @spec with_adapter(request, atom) :: request
+    def with_adapter(request, adapter) when is_atom(adapter), 
+        do: %{request | adapter: adapter }
 
     
     @doc """
@@ -89,7 +107,8 @@ defmodule HttpBuilder do
     Takes an optional path, to be added onto the host of the request.
     """
     @spec options(request, path) :: request      
-    def options(request, path \\ ""), do:  %{ request | method: :options, path: path }        
+    def options(request, path \\ ""), 
+        do:  %{ request | method: :options, path: path }        
     
     @doc """
     Sets the connect method on the request.
@@ -97,21 +116,20 @@ defmodule HttpBuilder do
     Takes an optional path, to be added onto the host of the request.
     """
     @spec options(request, path) :: request      
-    def connect(request, path \\ ""), do:  %{ request | method: :connect, path: path }        
+    def connect(request, path \\ ""), 
+        do:  %{ request | method: :connect, path: path }        
 
 
     @doc """
     Sets either a list of two-item tuples, or map of query params on the request.
     """
     @spec with_query_params(request, [String.t] | map) :: request
-    def with_query_params(request, query_params) when is_list(query_params) do
-        %{ request | query_params: query_params ++ request.query_params }                
-    end
+    def with_query_params(request, query_params) when is_list(query_params),
+        do:  %{ request | query_params: query_params ++ request.query_params }                
 
-    def with_query_params(request, query_params) when is_map(query_params) do
-      with_query_params(request, Map.to_list(query_params))
-    end    
-
+    def with_query_params(request, query_params) when is_map(query_params),
+        do: with_query_params(request, Map.to_list(query_params))
+    
 
     @doc """
     Sets either a list of two-item tuples, or map of headers on the request.
@@ -191,7 +209,7 @@ defmodule HttpBuilder do
     A recieve timeout is how long until the request recieves a response.
     """
     @spec with_recieve_timeout(request, integer) :: request                        
-    def with_recieve_timeout(request, timeout) do
+    def with_receive_timeout(request, timeout) do
         %{ request | rec_timeout: timeout }
     end
 
