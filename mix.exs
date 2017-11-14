@@ -22,7 +22,6 @@ defmodule HttpBuilder.Mixfile do
 
   defp package do
     [
-      name: "HttpBuilder",
       licenses: ["MIT"],
       maintainers: ["Matthew Potter"],
       links: %{"GitHub" => "https://github.com/matthewoden/Elixir-HttpBuilder"}
