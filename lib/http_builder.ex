@@ -204,11 +204,11 @@ defmodule HttpBuilder do
 
 
     @doc """
-    Sets the recieve timeout of the request.
+    Sets the receive timeout of the request.
 
-    A recieve timeout is how long until the request recieves a response.
+    A receive timeout is how long until the request recieves a response.
     """
-    @spec with_recieve_timeout(request, integer) :: request                        
+    @spec with_receive_timeout(request, integer) :: request                        
     def with_receive_timeout(request, timeout) do
         %{ request | rec_timeout: timeout }
     end

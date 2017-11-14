@@ -21,7 +21,7 @@ defmodule HttpBuilderTest do
   end
 
   test "with adapter sets an adapter for the request" do
-    request = new |> with_adapter(Adapters.HTTPosion)
+    request = new() |> with_adapter(Adapters.HTTPosion)
     
     assert request.adapter == Adapters.HTTPosion
 end

@@ -5,7 +5,7 @@ defmodule HttpBuilder.Mixfile do
     [
       app: :http_builder,
       name: "HttpBuilder",
-      source_url: "https://github.com/matthewoden/Elixir-HttpBuilder"
+      source_url: "https://github.com/matthewoden/Elixir-HttpBuilder",
       docs: docs(),
       package: package(),
       description: description(),
@@ -24,7 +24,7 @@ defmodule HttpBuilder.Mixfile do
     [
       name: "HttpBuilder",
       licenses: ["MIT"],
-      maintainers: ["Matthew Potter"]
+      maintainers: ["Matthew Potter"],
       links: %{"GitHub" => "https://github.com/matthewoden/Elixir-HttpBuilder"}
     ]
   end
