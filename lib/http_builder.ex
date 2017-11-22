@@ -16,7 +16,6 @@ defmodule HttpBuilder do
         |> with_json_body(%{"test" => "true"})
         |> with_request_timeout(10_000)
         |> with_receive_timeout(5_000)
-        |> with_retry(3)
         |> send() # kicks off the request.
     
     
