@@ -7,6 +7,8 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
   
     doctest HttpBuilder.Adapters.HTTPosion
 
+    def parse_response({:ok, response}), do: Poison.decode!(response.body)
+
     setup_all do
         HTTPoison.start()
         {:ok,  [] }
@@ -14,34 +16,36 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
 
     test "can make a GET request" do
         
-        {:ok, response} = 
+        body = 
             cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> get("/get")
             |> send()
+            |> parse_response()
 
-
-        assert response["url"] == "https://httpbin.org/get"
+        assert body["url"] == "https://httpbin.org/get"
     end
 
     test "can make a DELETE request" do
         
-        {:ok, response} = 
+        body = 
             cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> delete("/delete") 
             |> send()
+            |> parse_response()
 
-        assert response["url"] == "https://httpbin.org/delete"
+        assert body["url"] == "https://httpbin.org/delete"
     end
 
-    test "can make a POST request with a standard body" do
+    test "can make a POST request with a json body" do
         
-        {:ok, response } = 
+        body = 
             cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> post("/post") 
-            |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
+            |> with_json_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
             |> send()
-
-        assert response["json"] == %{ "title" => "foo", "body" => "bar", "userId" => 1 }
+            |> parse_response()            
+        
+        assert body["json"] == %{ "title" => "foo", "body" => "bar", "userId" => 1 }
     end
 
     test "can make a form-encoded POST request." do
@@ -53,32 +57,17 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
             "comments" => "test",
         }
 
-        {:ok, response } = 
+        response_body =
             cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPosion})
             |> post("/post") 
             |> with_form_encoded_body(body)
             |> send()
+            |> parse_response()                        
 
-        assert response["form"] ==  body
+        assert response_body["form"] ==  body
     end
 
-    # test "can make a streaming POST request" do
-    #     expected = %{"some" => "bytes"}
-        
-    #     body = Poison.encode!(expected) |> String.split("")
-
-    #     response = 
-    #         new("https://httpbin.org", Adapters.HTTPosion)
-    #         |> post("/post") 
-    #         |> with_stream_body(body)
-    #         |> with_headers(%{"Content-Length" => length(body) })
-    #         |> send()
-    
-    #     assert response ==  body
-    
-    # end
-
-    test "returns an error on a bad request" do
+    test "returns an error on a bad network request" do
         params = %{ host: "http://localhost:12345", adapter: Adapters.HTTPosion }
         response = 
             cast(params)
@@ -87,6 +76,6 @@ defmodule HttpBuilder.Adapters.HTTPosionTest do
             |> with_headers(%{"Content-type" => "application/json; charset=UTF-8"})
             |> send()
 
-        assert response == { :error, :econnrefused }
+        assert response == { :error, %HTTPoison.Error{id: nil, reason: :econnrefused} }
     end
 end

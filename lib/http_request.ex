@@ -1,7 +1,7 @@
 defmodule HttpBuilder.HttpRequest do
-    defstruct [ adapter: nil, body: %{}, headers: [], host: nil, path: "", 
+    defstruct [ adapter: nil, body: nil, headers: [], host: nil, path: "", 
                 method: nil,  query_params: [], rec_timeout: 5000, 
-                req_timeout: 8000,  retry: 3, options: []  ]
+                req_timeout: 8000, options: []  ]
 
     @type t :: %__MODULE__{
         adapter: atom,       
@@ -13,7 +13,6 @@ defmodule HttpBuilder.HttpRequest do
         query_params: list,
         rec_timeout: integer,
         req_timeout: integer,        
-        retry: integer,
         options: list
     }
 end

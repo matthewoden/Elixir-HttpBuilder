@@ -1,12 +1,19 @@
 # HttpBuilder
 
 A DSL for building chainable, composable HTTP requests. API structure taken from
-the lovely [elm-http-builder](https://github.com/lukewestby/elm-http-builder). 
+the lovely [elm-http-builder](https://github.com/lukewestby/elm-http-builder).
 
-Currently comes with a single adapter for `HTTPoison`. Feedback welcome!
+Currently comes with adapters for `HTTPoison`, `HTTPotion`, `Hackney` and
+`IBrowse`.
+
+Documentation can be found at
+[https://hexdocs.pm/http_builder](https://hexdocs.pm/http_builder).
+
+It's early days still. Feedback welcome!
+
 ## Example Usage
 
-``` elixir
+```elixir
 defmodule MyApp.APIClient do
 
   import HttpBuilder
@@ -22,10 +29,10 @@ defmodule MyApp.APIClient do
         "Authorization" => "Bearer #{MyApp.getToken()}",
         "Content-Type" => "application/json"
       })
-    
+
   end
 
-  def submit_widget(body) do 
+  def submit_widget(body) do
     client()
     |> post("/v1/path/to/submit")
     |> with_body(body)
@@ -45,25 +52,20 @@ end
 ```
 
 ## TODO
-- add support for streaming and chunked requests to hackney adapter?
-- add explicit support for multipart form requests (currently possible, just not explicit)
-- move integration tests to local api server, rather than httpbin
 
+* move integration tests to local api server, rather than httpbin
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `http_builder` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:http_builder, "~> 0.1.0"}
+    {:http_builder, "~> 0.2.0"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/http_builder](https://hexdocs.pm/http_builder).
-
+Documentation can be generated with
+[ExDoc](https://github.com/elixir-lang/ex_doc) and published on
+[HexDocs](https://hexdocs.pm). Once published, the docs can be found at
+[https://hexdocs.pm/http_builder](https://hexdocs.pm/http_builder).

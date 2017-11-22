@@ -5,6 +5,82 @@ defmodule HttpBuilder do
 
     Each method provided builds and updates a `HTTPBuilder.Request` object,
     until passed into `send`, which calls the adapter to invoke the request.
+
+    ## Example
+    Here's an example of a complete request chain:
+
+        HTTPBuilder.new()
+        |> with_adapter(HttpBuilder.Adapters.HTTPoison)
+        |> post("http://httparrot.com/post/1")
+        |> with_headers({"Authorization" => "Bearer token"})
+        |> with_json_body(%{"test" => "true"})
+        |> with_request_timeout(10_000)
+        |> with_receive_timeout(5_000)
+        |> with_retry(3)
+        |> send() # kicks off the request.
+    
+    
+    This can also be broken down into composable parts, allowing you to easily
+    write declarative pipelines for your API calls.
+
+        defmodule MyAPIClient do
+            alias HttpBuilder.Adapters
+
+            @adapter Application.get_env(:my_api_client, :client, Adapters.HTTPoison)
+
+            def client do
+                HTTPBuilder.new() 
+                |> with_adapter()
+                |> with_host("http://httparrot.com/")
+                |> with_headers({"Authorization" => "Bearer token"})
+                |> with_request_timeout(10_000)
+                |> with_receive_timeout(5_000)
+            end
+
+            def create(params) do
+                client()
+                |> post("/new")
+                |> with_json_body(params)
+                |> send()
+            end
+
+            def update(id, params) do
+                client()
+                |> put("/item/\#{id}")
+                |> with_json_body(params)
+                |> send()
+            end
+
+            def list(limit, offset) do
+                client()
+                |> get("/items")
+                |> with_query_params(%{"limit" => limit, "offset" => offset})
+                |> send()
+            end
+
+            def delete(id) do
+                client()
+                |> delete("/item/\#{id}")
+                |> send()
+            end
+
+        end
+
+    Sometimes, you don't want to make a call against a service. By putting your 
+    adapter in your config, you can also easily switch to a test HTTP adapter. 
+    By pattern matching against the request object, you can handle exact request
+    scenarios.
+
+        defmodule MyAPIClient.TestAdapter do
+
+            @behaviour HttpBuilder.Adapter
+
+            def send({method: :post, path: "/new"}), do: {:ok, new_placeholder_data }
+            def send({method: :get, path: "/items"}), do: {:ok, items_placeholder_data }
+
+            # ... other request options.
+        end
+        
     """
 
     alias HttpBuilder.HttpRequest
@@ -145,25 +221,36 @@ defmodule HttpBuilder do
 
 
     @doc """
-    Adds a body to the request, with no special notation of type.
+    Adds a body to the request, with no special notation of type. 
+    
+    This body should be used to handle requests not explicitly covered
+    by HTTPBuilder, or the adapter.
     """
     @spec with_body(request, term) :: request            
     def with_body(request, body) do
-        %{request | body: body }
+        %{request | body: {:other, body } }
     end
-
 
     @doc """
-    Marks a body as a streaming upload.
+    Marks a body to be sent as JSON. 
     
-    Takes a list of enumerables, and adds a tuple of `{:stream, enumerable}`
-    to the body of the request.
+    Takes the value passed in, and adds a tuple of `{:json, body}` to the request.
+    The adapter will be responsible for encoding the value.
     """
-    @spec with_stream_body(request, Enumerable.t) :: request
-    def with_stream_body(request, enumerable) when is_list(enumerable) do
-      %{ request | body: {:stream, enumerable}}
+    @spec with_json_body(request, list | map) :: request
+    def with_json_body(request, body) do
+        %{ request | body: {:json, body}}
     end
 
+    @doc """
+    Marks a body to be sent as a string. 
+
+    Takes a string, and adds a tuple of `{:string, body}` to the request.
+    """
+    @spec with_string_body(request, list | map) :: request
+    def with_string_body(request, body) when is_binary(body) do
+        %{ request | body: {:string, body}}
+    end
 
     @doc """
     Marks a body as a file upload.
@@ -181,11 +268,13 @@ defmodule HttpBuilder do
     Marks a body as a form-encoded upload. 
     
     Takes either a list of two-item tuples, or a map of key-value pairs, and
-    adds a tuple of `{:form, [{"key", "value"} ...]}` to the body of the request.
+    adds a tuple of `{:form, [{"key", "value"} ...]}` to the body of the request,
+    and sets the Content-Type to "application/x-www-form-urlencoded".
     """
     @spec with_form_encoded_body(request, [String.t] | map) :: request            
     def with_form_encoded_body(request, body) when is_list(body) do
         %{request | body: {:form, body } }        
+        |> with_headers([{"Content-Type", "application/x-www-form-urlencoded"}])
     end        
 
     def with_form_encoded_body(request, body) when is_map(body) do
@@ -195,7 +284,8 @@ defmodule HttpBuilder do
     @doc """
     Sets the request timeout of the request.
 
-    A request timeout is how long the overall request should take.
+    A request timeout is how long the overall request should take. A request
+    has a default value of `8000`.
     """
     @spec with_request_timeout(request, integer) :: request                  
     def with_request_timeout(request, timeout) do
@@ -206,21 +296,13 @@ defmodule HttpBuilder do
     @doc """
     Sets the receive timeout of the request.
 
-    A receive timeout is how long until the request recieves a response.
+    A receive timeout is how long until the request recieves a response. A request
+    has a default value of `5000`.
     """
     @spec with_receive_timeout(request, integer) :: request                        
     def with_receive_timeout(request, timeout) do
         %{ request | rec_timeout: timeout }
     end
-
-    @doc """
-    Sets the number of times to retry the request on failure.
-    """
-    @spec with_retry(request, integer) :: request                              
-    def with_retry(request, retry_amount) do
-        %{ request | retry: retry_amount}
-    end
-
 
     @doc """
     Sets additional options for the request that may not be handled

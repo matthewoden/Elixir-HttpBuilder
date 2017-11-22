@@ -117,28 +117,36 @@ end
   end
 
 
-  test "with_body adds the body to the request" do
+  test "with_body the body to the request" do
     request = 
       %HttpRequest{}
       |> with_body(%{"test" => true})
 
-    assert request.body == %{"test" => true}
+    assert request.body == {:other, %{"test" => true} }
   end
 
-  test "with_stream_body marks the body as a streaming enumerable" do
+  test "with_json_body adds a body to the request, marked to be parsed if needed" do
     request = 
       %HttpRequest{}
-      |> with_stream_body(["alpha", "beta"])
+      |> with_json_body(%{"test" => true})
 
-    assert request.body == {:stream ,["alpha", "beta"] }
+    assert request.body == {:json, %{"test" => true} }
   end
 
-  test "with_file_body mark the request body as a path-based upload." do
+  test "with_string_body adds a body to the request, marked as json" do
+    request = 
+      %HttpRequest{}
+      |> with_string_body("test")
+
+    assert request.body == {:string, "test"}
+  end
+
+  test "with_file_body marks the request body as a path-based upload." do
     request = 
       %HttpRequest{}
       |> with_file_body("/path/to/file")
 
-    assert request.body == {:file,"/path/to/file" }
+    assert request.body == {:file, "/path/to/file" }
   end
 
   test "with_form_encoded_body takes a list of two-item tuples, and marks the request body as form-encoded." do
@@ -166,14 +174,6 @@ end
     assert request.req_timeout == 3
   end
 
-
-  test "with_retry marks how many attempts should be made in the event of network failure." do
-    request = 
-      %HttpRequest{}
-      |> with_retry(3)
-
-    assert request.retry == 3
-  end
 
   test "with_options appends a single item to a list of additional options" do
     request = 
