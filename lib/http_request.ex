@@ -1,4 +1,8 @@
 defmodule HttpBuilder.HttpRequest do
+    @moduledoc """
+    Provides a struct, containing all the options for a potential HTTP Request.
+    """
+
     defstruct [ adapter: nil, body: nil, headers: [], host: nil, path: "", 
                 method: nil,  query_params: [], rec_timeout: 5000, 
                 req_timeout: 8000, options: []  ]

@@ -28,9 +28,12 @@ if Code.ensure_loaded?(:ibrowse) do
 
         @impl true
         @spec send(HttpRequest.t) :: HttpBuilder.Adapter.result
+        @doc """"
+        Sends a `HttpRequest`
+        """
         def send(request), do: request |> format_request() |> do_send()
         
-        def format_request(request) do 
+        defp format_request(request) do 
 
             %{
                 options: format_options(request),
@@ -48,8 +51,8 @@ if Code.ensure_loaded?(:ibrowse) do
         defp format_body({:file, path}), do: File.read!(path)
         defp format_body({:json, body}), do: @parser.encode!(body)
         
-        def format_headers([]), do: []
-        def format_headers(headers) do
+        defp format_headers([]), do: []
+        defp format_headers(headers) do
             Keyword.new(headers, fn {key, val} -> {String.to_atom(key), val} end)
         end
 

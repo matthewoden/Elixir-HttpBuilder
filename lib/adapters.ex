@@ -32,7 +32,14 @@ defmodule HttpBuilder.Adapter.JSONParser do
     @type encoded :: term
     @type decoded :: nil | true | false | list | float | integer | String.t | map
 
+    @doc """
+    Takes a value, and encodes it into JSON
+    """
     @callback encode!(value :: term, options :: Keyword.t) :: encoded
+    
+    @doc """
+    Takes JSON, and decodes it to a value
+    """
     @callback decode!(value :: term, options :: Keyword.t) :: decoded
     
 

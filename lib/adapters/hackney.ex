@@ -25,9 +25,12 @@ if Code.ensure_loaded?(:hackney) do
 
         @impl true
         @spec send(HttpRequest.t) :: HttpBuilder.Adapter.result
+        @doc """"
+        Sends a `HttpRequest`
+        """
         def send(request), do: request |> format_request() |> do_send()
 
-        def format_request(request) do   
+        defp format_request(request) do   
             %{
                 options: create_options(request),
                 method: request.method,
