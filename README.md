@@ -60,7 +60,7 @@ end
 ```elixir
 def deps do
   [
-    {:http_builder, "~> 0.2.0"}
+    {:http_builder, "~> 0.2.4"}
   ]
 end
 ```
