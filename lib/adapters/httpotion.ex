@@ -27,7 +27,7 @@ if Code.ensure_loaded?(HTTPotion) do
 
         @impl true
         @spec send(HttpRequest.t) :: HttpBuilder.Adapter.result
-        @doc """"
+        @doc """
         Sends a `HttpRequest`
         """
         def send(request), do: request |> format_request() |> do_send()
