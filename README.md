@@ -1,3 +1,5 @@
+![](https://i.imgur.com/4xZNmrH.png)
+
 # HttpBuilder
 
 A DSL for building chainable, composable HTTP requests. API structure taken from

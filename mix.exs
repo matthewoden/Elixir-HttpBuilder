@@ -9,7 +9,7 @@ defmodule HttpBuilder.Mixfile do
       docs: docs(),
       package: package(),
       description: description(),
-      version: "0.2.4",
+      version: "0.2.5",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps()
@@ -35,7 +35,8 @@ defmodule HttpBuilder.Mixfile do
   defp docs do
     [
       main: "HttpBuilder", 
-      extras: ["README.md"]
+      extras: ["README.md"],
+      logo: "images/logo.png"
     ]
   end
 
