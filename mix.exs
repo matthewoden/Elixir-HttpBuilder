@@ -9,7 +9,7 @@ defmodule HttpBuilder.Mixfile do
       docs: docs(),
       package: package(),
       description: description(),
-      version: "0.2.5",
+      version: "0.2.6",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps()
@@ -42,6 +42,7 @@ defmodule HttpBuilder.Mixfile do
 
   defp deps do
     [
+      {:hackney, "~> 1.10", optional: true},
       {:httpoison, "~> 0.13.0", optional: true},
       {:poison, "~> 3.0", optional: true},
       {:httpotion, "~> 3.0", optional: true},
