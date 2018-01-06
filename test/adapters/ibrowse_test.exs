@@ -16,7 +16,7 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
     end
 
     setup_all do
-        :ibrowse.start()
+        Application.ensure_all_started(:ibrowse)
         
         {:ok,  [] }
     end
