@@ -1,12 +1,12 @@
 if Code.ensure_loaded?(HTTPoison) do
-    defmodule HttpBuilder.Adapters.HTTPosion do
+    defmodule HttpBuilder.Adapters.HTTPoison do
         alias HttpBuilder.HttpRequest
         
         @moduledoc """
         An adapter for using HTTPoison. Expects a JSON parser to be
         included in the HTTPBuilder configuration for encoding requests. 
         
-            config :http_builder, HttpBuilder.Adapters.HTTPosion
+            config :http_builder, HttpBuilder.Adapters.HTTPoison
                 json_parser: HttpBuilder.Adapters.JSONParser.Poison
         
         If you have `Poison` as a dependancy, then this adapter will be 
