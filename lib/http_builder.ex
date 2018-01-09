@@ -74,8 +74,8 @@ defmodule HttpBuilder do
 
             @behaviour HttpBuilder.Adapter
 
-            def send({method: :post, path: "/new"}), do: {:ok, new_placeholder_data }
-            def send({method: :get, path: "/items"}), do: {:ok, items_placeholder_data }
+            def send(%{method: :post, path: "/new"}), do: {:ok, new_placeholder_data }
+            def send(%{method: :get, path: "/items"}), do: {:ok, items_placeholder_data }
 
             # ... other request options.
         end
