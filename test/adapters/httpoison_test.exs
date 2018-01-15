@@ -11,36 +11,36 @@ defmodule HttpBuilder.Adapters.HTTPoisonTest do
     def parse_response({:ok, response}), do: Poison.decode!(response.body)
 
     setup_all do
-        HTTPoison.start()
+        :application.ensure_all_started(:httpoison)
         {:ok,  [] }
     end
 
     test "can make a GET request" do
         
         body = 
-            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPoison})
+            cast(%{ host: "http://localhost:8080", adapter: Adapters.HTTPoison})
             |> get("/get")
             |> send()
             |> parse_response()
 
-        assert body["url"] == "https://httpbin.org/get"
+        assert body["url"] == "http://localhost:8080/get"
     end
 
     test "can make a DELETE request" do
         
         body = 
-            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPoison})
+            cast(%{ host: "http://localhost:8080", adapter: Adapters.HTTPoison})
             |> delete("/delete") 
             |> send()
             |> parse_response()
 
-        assert body["url"] == "https://httpbin.org/delete"
+        assert body["url"] == "http://localhost:8080/delete"
     end
 
     test "can make a POST request with a json body" do
         
         body = 
-            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPoison})
+            cast(%{ host: "http://localhost:8080", adapter: Adapters.HTTPoison})
             |> post("/post") 
             |> with_json_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
             |> send()
@@ -59,7 +59,7 @@ defmodule HttpBuilder.Adapters.HTTPoisonTest do
         }
 
         response_body =
-            cast(%{ host: "https://httpbin.org", adapter: Adapters.HTTPoison})
+            cast(%{ host: "http://localhost:8080", adapter: Adapters.HTTPoison})
             |> post("/post") 
             |> with_form_encoded_body(body)
             |> send()
@@ -73,8 +73,7 @@ defmodule HttpBuilder.Adapters.HTTPoisonTest do
         response = 
             cast(params)
             |> post("/posts") 
-            |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
-            |> with_headers(%{"Content-type" => "application/json; charset=UTF-8"})
+            |> with_body("{}")
             |> send()
 
         assert response == { :error, %HTTPoison.Error{id: nil, reason: :econnrefused} }
@@ -82,7 +81,7 @@ defmodule HttpBuilder.Adapters.HTTPoisonTest do
 
     test "typo module delegates with warning" do
         request = cast(%{ 
-            host: "https://httpbin.org", 
+            host: "http://localhost:8080", 
             method: :get,
             path: "/get",
             adapter: Adapters.HTTPosion

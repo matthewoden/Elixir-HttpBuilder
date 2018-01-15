@@ -15,11 +15,10 @@ defmodule HttpBuilder.Adapters.HackneyTest do
     end
 
 
-    def client, do: cast(%{ host: "https://httpbin.org", adapter: Adapters.Hackney})
+    def client, do: cast(%{ host: "http://localhost:8080", adapter: Adapters.Hackney})
 
     setup_all do
-        # HTTPoison starts hackney anyway.
-        HTTPoison.start()
+        :application.ensure_all_started(:hackney)
         {:ok,  [] }
     end
 
@@ -33,7 +32,7 @@ defmodule HttpBuilder.Adapters.HackneyTest do
             |> send()
             |> parse_response()
 
-        assert body["url"] == "https://httpbin.org/get"
+        assert body["url"] == "http://localhost:8080/get"
     end
 
     test "can make a DELETE request" do
@@ -44,7 +43,7 @@ defmodule HttpBuilder.Adapters.HackneyTest do
             |> send()
             |> parse_response()
 
-        assert body["url"] == "https://httpbin.org/delete"
+        assert body["url"] == "http://localhost:8080/delete"
     end
 
     test "can make a POST request with a json body" do

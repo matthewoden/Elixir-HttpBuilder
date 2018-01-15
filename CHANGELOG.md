@@ -1,6 +1,28 @@
 # Changelog
 
+## Jan 15th
+
+### `0.3.0`
+
+* adds `application/json` as a content type for `with_json_body` calls
+* Prevented ibrowse options from flattening in HTTPotion calls
+* updated documentation for easier copy/paste
+
+## Jan 6th 2018
+
+### `0.2.7`
+
+* Fixed typo in HTTPoison adapter, delegating to fixed message with depreciation warning.
+
+## Dec 20th 2017
+
+### `0.2.6`
+
+* Added hackney as an `optional` dependancy.
+
 ## Nov 22th 2017
+
+### `0.2.0 - 2.0.5` (patches were more than an hour apart)
 
 This push has breaking changes from 0.1.1
 

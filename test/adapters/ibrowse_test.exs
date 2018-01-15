@@ -7,17 +7,18 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
   
     doctest HttpBuilder.Adapters.IBrowse
 
+    def parse_response({:ok, _status, _headers, ""}), do: %{}
+
     def parse_response({:ok, _status, _headers, body}) do
         Poison.decode!(body)
     end
 
     def client do        
-        cast(%{ host: "http://httpbin.org", adapter: Adapters.IBrowse})
+        cast(%{ host: "http://localhost:8080", adapter: Adapters.IBrowse})
     end
 
     setup_all do
-        Application.ensure_all_started(:ibrowse)
-        
+        {:ok, _} = :application.ensure_all_started(:ibrowse)
         {:ok,  [] }
     end
 
@@ -29,7 +30,7 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
             |> send()
             |> parse_response()
 
-        assert response["url"] == "http://httpbin.org/get"
+        assert response["url"] == "http://localhost:8080/get"
     end
 
     test "can make a DELETE request" do
@@ -40,7 +41,7 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
             |> send()
             |> parse_response()
 
-        assert body["url"] == "http://httpbin.org/delete"
+        assert body["url"] == "http://localhost:8080/delete"
     end
 
     test "can make a POST request with a json body" do
@@ -74,15 +75,14 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
         assert response_body["form"] ==  body
     end
 
-    test "returns an error on a bad network request" do
-        params = %{ host: "http://localhost:12345", adapter: Adapters.Hackney }
+    test "returns an error on a bad network request " do
+        params = %{ host: "http://localhost:12345", adapter: Adapters.IBrowse }
         response = 
             cast(params)
             |> post("/posts") 
-            |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
-            |> with_headers(%{"Content-type" => "application/json; charset=UTF-8"})
+            |> with_body("{}")
             |> send()
 
-        assert response == { :error, :econnrefused}
+        assert response == {:error, {:conn_failed, {:error, :econnrefused}}}
     end
 end

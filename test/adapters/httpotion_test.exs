@@ -7,17 +7,18 @@ defmodule HttpBuilder.Adapters.HTTPotionTest do
   
     doctest HttpBuilder.Adapters.HTTPotion
 
+
+    def parse_response(%{body: ""}), do: %{}
     def parse_response(response) do
         Poison.decode!(response.body)
     end
 
     def client do        
-        cast(%{ host: "http://httpbin.org", adapter: Adapters.HTTPotion})
+        cast(%{ host: "http://localhost:8080", adapter: Adapters.HTTPotion})
     end
 
     setup_all do
-        HTTPotion.start()
-        
+        :application.ensure_all_started(:httpotion)
         {:ok,  [] }
     end
 
@@ -31,7 +32,7 @@ defmodule HttpBuilder.Adapters.HTTPotionTest do
             |> send()
             |> parse_response()
 
-        assert response["url"] == "http://httpbin.org/get"
+        assert response["url"] == "http://localhost:8080/get"
     end
 
     test "can make a DELETE request" do
@@ -42,7 +43,7 @@ defmodule HttpBuilder.Adapters.HTTPotionTest do
             |> send()
             |> parse_response()
 
-        assert body["url"] == "http://httpbin.org/delete"
+        assert body["url"] == "http://localhost:8080/delete"
     end
 
     test "can make a POST request with a json body" do
@@ -77,14 +78,24 @@ defmodule HttpBuilder.Adapters.HTTPotionTest do
     end
 
     test "returns an error on a bad network request" do
-        params = %{ host: "http://localhost:12345", adapter: Adapters.Hackney }
+        params = %{ host: "http://localhost:12345", adapter: Adapters.HTTPotion }
         response = 
             cast(params)
             |> post("/posts") 
-            |> with_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
-            |> with_headers(%{"Content-type" => "application/json; charset=UTF-8"})
+            |> with_body("{}")
             |> send()
 
-        assert response == { :error, :econnrefused}
+        assert response == %HTTPotion.ErrorResponse{ message: "econnrefused" }
+    end
+
+    test "accepts proxy options" do
+        response = 
+            client()
+            |> get("/get") 
+            |> with_options([ibrowse: [{:proxy, 'http://localhost:4001'}] ])
+            |> send()
+            |> parse_response()
+
+        assert response["url"] == "http://localhost:8080/get"
     end
 end
