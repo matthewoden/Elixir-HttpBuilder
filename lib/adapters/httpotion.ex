@@ -76,8 +76,8 @@ if Code.ensure_loaded?(HTTPotion) do
                 ] 
             
             request.options
-            |> Enum.map(fn  
-                    {:ibrowse, options } -> Keyword.put(options, :connect_timeout, request.rec_timeout)
+            |> Enum.map(fn 
+                    { :ibrowse, options } -> { :ibrowse, options |> Keyword.put(:connect_timeout, request.rec_timeout) }
                     item -> item
                 end)
             |> Enum.concat(potion_options)
