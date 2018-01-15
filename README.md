@@ -53,10 +53,6 @@ defmodule MyApp.APIClient do
 end
 ```
 
-## TODO
-
-* move integration tests to local api server, rather than httpbin
-
 ## Installation
 
 ```elixir
