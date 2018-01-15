@@ -233,12 +233,14 @@ defmodule HttpBuilder do
     @doc """
     Marks a body to be sent as JSON. 
     
-    Takes the value passed in, and adds a tuple of `{:json, body}` to the request.
+    Takes the value passed in, and adds a tuple of `{:json, body}` to the request,
+    and adds `application/json` as `Content-Type headers`
+
     The adapter will be responsible for encoding the value.
     """
     @spec with_json_body(request, list | map) :: request
     def with_json_body(request, body) do
-        %{ request | body: {:json, body}}
+        %{ request | body: {:json, body}} |> with_headers(%{"Content-Type" => "application/json"})
     end
 
     @doc """
