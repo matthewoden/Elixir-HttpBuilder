@@ -9,7 +9,7 @@ defmodule HttpBuilder.Mixfile do
       docs: docs(),
       package: package(),
       description: description(),
-      version: "0.3.0",
+      version: "0.4.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       deps: deps()
@@ -43,12 +43,13 @@ defmodule HttpBuilder.Mixfile do
   defp deps do
     [
       {:hackney, "~> 1.10", optional: true},
-      {:httpoison, "~> 0.13.0", optional: true},
+      {:httpoison, "0.13.0", optional: true},
       {:poison, "~> 3.0", optional: true},
       {:httpotion, "~> 3.0", optional: true},
       {:ibrowse, "~> 4.4.0", optional: true},
       {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:httparrot, "~> 1.0", only: :test},
+      {:jason, "~> 1.0", only: :test},
       {:proxy, only: :test, github: "matthewoden/proxy"}
     ]
   end

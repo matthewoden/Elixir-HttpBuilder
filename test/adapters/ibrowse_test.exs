@@ -56,6 +56,19 @@ defmodule HttpBuilder.Adapters.IBrowseTest do
         assert body["json"] == %{ "title" => "foo", "body" => "bar", "userId" => 1 }
     end
 
+    test "can make a POST request with a custom parser" do
+        
+        body = 
+            client()
+            |> post("/post") 
+            |> with_json_body(%{ "title" => "foo", "body" => "bar", "userId" => 1 })
+            |> with_json_parser(Jason)
+            |> send()
+            |> parse_response()            
+        
+        assert body["json"] == %{ "title" => "foo", "body" => "bar", "userId" => 1 }
+    end
+
     test "can make a form-encoded POST request." do
         body = %{
             "custname" => "test",

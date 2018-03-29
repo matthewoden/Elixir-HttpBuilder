@@ -6,7 +6,7 @@ A DSL for building chainable, composable HTTP requests. API structure taken from
 the lovely [elm-http-builder](https://github.com/lukewestby/elm-http-builder).
 
 Currently comes with adapters for `HTTPoison`, `HTTPotion`, `Hackney` and
-`IBrowse`.
+`IBrowse`. JSON parsers are configurable, but defaults to `Poison` if present.
 
 Documentation can be found at
 [https://hexdocs.pm/http_builder](https://hexdocs.pm/http_builder).
@@ -58,7 +58,7 @@ end
 ```elixir
 def deps do
   [
-    {:http_builder, "~> 0.2.4"}
+    {:http_builder, "~> 0.4.0"}
   ]
 end
 ```

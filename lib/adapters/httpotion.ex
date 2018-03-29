@@ -5,25 +5,11 @@ if Code.ensure_loaded?(HTTPotion) do
         @moduledoc """
         An adapter for using HTTPotion. Expects a JSON parser to be
         included in the HTTPBuilder configuration for encoding requests. 
-        
-            config :http_builder, HttpBuilder.Adapters.HTTPotion
-                json_parser: HttpBuilder.Adapters.JSONParser.Poison
-        
-        If you have `Poison` as a dependancy, then this adapter will be 
-        selected by default.
-
-        Returns an `HTTPoison` structs as responses. or `HTTPoison.Error`
-
+      
+        Returns `HTTPotion` structs as responses. 
         """
 
-        
         @behaviour HttpBuilder.Adapter
-
-        @default_parser if Code.ensure_loaded?(Poison), do: HttpBuilder.Adapters.JSONParser.Poison, else: nil
-        
-        @config Application.get_env(:http_builder, __MODULE__, [json_parser: @default_parser])
-
-        @parser Keyword.get(@config, :json_parser) || raise "No JSON parser configured. Please add a parser to #{__MODULE__}'s configuration."
 
         @impl true
         @spec send(HttpRequest.t) :: HttpBuilder.Adapter.result
@@ -41,12 +27,12 @@ if Code.ensure_loaded?(HTTPotion) do
             }
         end
         
-        defp format_body(nil), do: ""
-        defp format_body({:other, body}), do: body
-        defp format_body({:string, body}), do: body
-        defp format_body({:form, body}), do: body |> URI.encode_query
-        defp format_body({:file, path}), do: File.read!(path)
-        defp format_body({:json, body}), do: @parser.encode!(body)
+        defp format_body(%{ body: nil}), do: ""
+        defp format_body(%{ body: {:other, body}}), do: body
+        defp format_body(%{ body: {:string, body}}), do: body
+        defp format_body(%{ body: {:form, body}}), do: body |> URI.encode_query
+        defp format_body(%{ body: {:file, path}}), do: File.read!(path)
+        defp format_body(%{ body: {:json, body}} = request), do: request.json_parser.encode!(body)
         
         defp format_headers([]), do: []
         defp format_headers(headers) do
@@ -70,7 +56,7 @@ if Code.ensure_loaded?(HTTPotion) do
         defp format_options(request) do
             potion_options = 
                 [
-                    body: format_body(request.body),
+                    body: format_body(request),
                     headers: format_headers(request.headers),
                     timeout: request.req_timeout,
                 ] 

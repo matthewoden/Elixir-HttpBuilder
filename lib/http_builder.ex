@@ -13,6 +13,7 @@ defmodule HttpBuilder do
         |> with_adapter(HttpBuilder.Adapters.HTTPoison)
         |> post("http://httparrot.com/post/1")
         |> with_headers(%{"Authorization" => "Bearer token"})
+        |> with_json_parser(Jason)
         |> with_json_body(%{"test" => "true"})
         |> with_request_timeout(10_000)
         |> with_receive_timeout(5_000)
@@ -241,6 +242,16 @@ defmodule HttpBuilder do
     @spec with_json_body(request, list | map) :: request
     def with_json_body(request, body) do
         %{ request | body: {:json, body}} |> with_headers(%{"Content-Type" => "application/json"})
+    end
+
+    @doc """
+    Sets the json parser for the request. Defaults to `Poison` if available.
+
+    Most JSON parsers can be used out of the box. See `HttpBuilder.Adapter.JSONParser` for adapter details.
+    """
+    @spec with_json_body(request, module) :: request
+    def with_json_parser(request, parser) do
+        %{ request | json_parser: parser}
     end
 
     @doc """

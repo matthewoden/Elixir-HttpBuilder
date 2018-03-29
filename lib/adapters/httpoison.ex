@@ -5,25 +5,12 @@ if Code.ensure_loaded?(HTTPoison) do
         @moduledoc """
         An adapter for using HTTPoison. Expects a JSON parser to be
         included in the HTTPBuilder configuration for encoding requests. 
-        
-            config :http_builder, HttpBuilder.Adapters.HTTPoison
-                json_parser: HttpBuilder.Adapters.JSONParser.Poison
-        
-        If you have `Poison` as a dependancy, then this adapter will be 
-        selected by default.
 
-        Returns an `HTTPoison` structs as responses. or `HTTPoison.Error`
+        Returns `HTTPoison` structs as responses. 
         """
 
-        
         @behaviour HttpBuilder.Adapter
-
-        @default_parser if Code.ensure_loaded?(Poison), do: HttpBuilder.Adapters.JSONParser.Poison, else: nil
         
-        @config Application.get_env(:http_builder, __MODULE__, [json_parser: @default_parser])
-
-        @parser Keyword.get(@config, :json_parser) || raise "No JSON parser configured. Please add a parser to #{__MODULE__}'s configuration."
-
         @impl true
         @spec send(HttpRequest.t) :: HttpBuilder.Adapter.result
         @doc """
@@ -36,16 +23,16 @@ if Code.ensure_loaded?(HTTPoison) do
                 options: create_options(request),
                 method: request.method,
                 uri: request.host <> request.path,
-                body: format_body(request.body),
+                body: format_body(request),
                 headers: request.headers,
             }
         end
         
-        defp format_body(nil), do: ""
-        defp format_body({:other, body}), do: body
-        defp format_body({:string, body}), do: body
-        defp format_body({:json, body}), do: @parser.encode!(body)
-        defp format_body({atom, body}), do: {atom, body}
+        defp format_body(%{ body: nil }), do: ""
+        defp format_body(%{ body: {:other, body} }), do: body
+        defp format_body(%{ body: {:string, body} }), do: body
+        defp format_body(%{ body: {:json, body} } = request), do: request.json_parser.encode!(body)
+        defp format_body(%{ body: {atom, body} }), do: {atom, body}
         
         defp create_options(request) do
             timeout_options = [ 

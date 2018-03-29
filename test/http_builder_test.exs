@@ -133,6 +133,14 @@ end
     assert request.body == {:json, %{"test" => true} }
   end
 
+  test "with_json_parser adds a parser to the request" do
+    request = 
+      %HttpRequest{}
+      |> with_json_parser(Jason)
+
+    assert request.json_parser == Jason
+  end
+
   test "with_string_body adds a body to the request, marked as json" do
     request = 
       %HttpRequest{}
